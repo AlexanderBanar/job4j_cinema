@@ -58,7 +58,7 @@ public class PsqlStore implements Store {
                             it.getInt("session_id"),
                             it.getInt("row"),
                             it.getInt("cell"),
-                            it.getInt("account")
+                            it.getInt("account_id")
                     ));
                 }
             }

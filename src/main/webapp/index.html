@@ -19,8 +19,25 @@
             url: 'http://localhost:8080/cinema/hall',
             dataType: 'json'
         }).done(function (data) {
-            $('#hall').html(data);
-            console.log(data);
+            let tickets = ""
+            for (let i = 1; i <= 3; i++) {
+                tickets += "<tr>" + "<th>" + "Ряд, " + i + "</th>"
+                for (let j = 0; j < data.length; j++) {
+                    if (data[j]["accountId"] === 0) {
+                        tickets += "<td>"
+                            + "<input type='radio' name='ticket' id='ticket' value=" + data[j]["row"] + data[j]["cell"] + ">"
+                            + " Место " + data[j]["cell"] + " свободно"
+                            + "</td>"
+                    } else {
+                        tickets += "<td>"
+                            + "<input disabled type='radio' name='ticket' id='ticket' value=" + data[j]["row"] + data[j]["cell"] + ">"
+                            + " Место " + data[j]["cell"] + " занято"
+                            + "</td>"
+                    }
+                }
+                tickets += "</tr>"
+            }
+            $('#desc').html(tickets);
         }).fail(function (err) {
             console.log(err);
         });
@@ -70,7 +87,7 @@
                 <th>3</th>
             </tr>
             </thead>
-            <tbody id="hall">
+            <tbody id="desc">
             </tbody>
         </table>
     </div>
