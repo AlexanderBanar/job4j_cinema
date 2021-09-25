@@ -6,4 +6,6 @@ public interface Store {
     Collection<Ticket> findAllTickets();
 
     void buyTicket(Account account, Ticket ticket);
+
+    String getSeatsHtml();
 }

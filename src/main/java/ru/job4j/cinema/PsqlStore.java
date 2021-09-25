@@ -54,8 +54,12 @@ public class PsqlStore implements Store {
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    tickets.add(new Ticket(it.getInt("session_id"), it.getInt("row"),
-                            it.getInt("cell"), it.getInt("account_id")));
+                    tickets.add(new Ticket(
+                            it.getInt("session_id"),
+                            it.getInt("row"),
+                            it.getInt("cell"),
+                            it.getInt("account")
+                    ));
                 }
             }
         } catch (Exception e) {
@@ -102,7 +106,7 @@ public class PsqlStore implements Store {
         return generatedAccountId;
     }
 
-    public static void main(String[] args) {
+    public String getSeatsHtml() {
         List<Ticket> allTickets = (List<Ticket>) PsqlStore.instOf().findAllTickets();
         StringBuilder ticketsToHtml = new StringBuilder();
         int counter = 0;
@@ -130,8 +134,6 @@ public class PsqlStore implements Store {
             }
             ticketsToHtml.append("</tr>");
         }
-        System.out.println(ticketsToHtml.toString());
+        return ticketsToHtml.toString();
     }
-
-
 }

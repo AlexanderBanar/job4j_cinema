@@ -20,6 +20,7 @@
             dataType: 'json'
         }).done(function (data) {
             $('#hall').html(data);
+            console.log(data);
         }).fail(function (err) {
             console.log(err);
         });
