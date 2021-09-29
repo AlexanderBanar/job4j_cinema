@@ -15,5 +15,13 @@
         <servlet-name>HallServlet</servlet-name>
         <url-pattern>/hall</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>PaymentServlet</servlet-name>
+        <servlet-class>ru.job4j.servlet.PaymentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PaymentServlet</servlet-name>
+        <url-pattern>/payment.do</url-pattern>
+    </servlet-mapping>
 
 </web-app>

@@ -7,5 +7,5 @@ public interface Store {
 
     void buyTicket(Account account, Ticket ticket);
 
-    String getSeatsHtml();
+    boolean isFree(Ticket ticket);
 }

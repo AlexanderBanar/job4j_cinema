@@ -7,10 +7,7 @@ import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class PsqlStore implements Store {
     private final BasicDataSource pool = new BasicDataSource();
@@ -48,13 +45,14 @@ public class PsqlStore implements Store {
 
     @Override
     public Collection<Ticket> findAllTickets() {
-        List<Ticket> tickets = new ArrayList<>();
+        List<Ticket> tickets = new ArrayList<>(9);
+        Map<Integer, Ticket> map = new HashMap<>(9);
         try (Connection cn = pool.getConnection();
              PreparedStatement ps = cn.prepareStatement("SELECT * FROM cinema.public.tickets")
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    tickets.add(new Ticket(
+                    map.put(it.getInt("id"), new Ticket(
                             it.getInt("session_id"),
                             it.getInt("row"),
                             it.getInt("cell"),
@@ -64,6 +62,9 @@ public class PsqlStore implements Store {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        for (int i = 10; i <= 18; i++) {
+            tickets.add(map.get(i));
         }
         return tickets;
     }
@@ -97,7 +98,7 @@ public class PsqlStore implements Store {
             ps.execute();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    generatedAccountId = rs.getInt(1);
+                    generatedAccountId = rs.getInt("id");
                 }
             }
         } catch (Exception e) {
@@ -106,34 +107,23 @@ public class PsqlStore implements Store {
         return generatedAccountId;
     }
 
-    public String getSeatsHtml() {
-        List<Ticket> allTickets = (List<Ticket>) PsqlStore.instOf().findAllTickets();
-        StringBuilder ticketsToHtml = new StringBuilder();
-        int counter = 0;
-        for (int i = 1; i < 4; i++) {
-            ticketsToHtml.append("<tr><th>").append(i).append("</th>");
-            for (int j = 1; j < 4; j++) {
-                if (allTickets.size() > counter) {
-                    if (allTickets.get(counter).getAccountId() == 0) {
-                        ticketsToHtml.append("<td>")
-                                .append("<input type='radio' name='ticket' value='")
-                                .append(allTickets.get(counter).getRow())
-                                .append(allTickets.get(counter).getCell()).append("'>")
-                                .append(" Место, ")
-                                .append(allTickets.get(counter).getCell()).append("</td>");
-
-                    } else {
-                        ticketsToHtml.append("<input disabled type='radio' name='ticket' value='")
-                                .append(allTickets.get(counter).getRow())
-                                .append(allTickets.get(counter).getCell()).append("'>")
-                                .append(" Место, ")
-                                .append(allTickets.get(counter).getCell()).append("</td>");
-                    }
-                    counter++;
+    @Override
+    public boolean isFree(Ticket ticket) {
+        int result = 0;
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement(
+                     "SELECT * FROM cinema.public.tickets WHERE row = (?) and cell = (?)")
+        ) {
+            ps.setInt(1, ticket.getRow());
+            ps.setInt(2, ticket.getCell());
+            try (ResultSet it = ps.executeQuery()) {
+                if (it.next()) {
+                    result = it.getInt("account_id");
                 }
             }
-            ticketsToHtml.append("</tr>");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return ticketsToHtml.toString();
+        return result == 0;
     }
 }

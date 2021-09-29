@@ -13,27 +13,32 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+    (() => setTimeout(ready, 0))();
+    (() => setInterval(ready, 15000))();
+
+    function ready () {
         $.ajax({
             type: 'GET',
             url: 'http://localhost:8080/cinema/hall',
             dataType: 'json'
         }).done(function (data) {
             let tickets = ""
+            let counter = 0;
             for (let i = 1; i <= 3; i++) {
                 tickets += "<tr>" + "<th>" + "Ряд, " + i + "</th>"
-                for (let j = 0; j < data.length; j++) {
-                    if (data[j]["accountId"] === 0) {
+                for (let j = 1; j <= 3; j++) {
+                    if (data[counter]["accountId"] === 0) {
                         tickets += "<td>"
-                            + "<input type='radio' name='ticket' id='ticket' value=" + data[j]["row"] + data[j]["cell"] + ">"
-                            + " Место " + data[j]["cell"] + " свободно"
+                            + "<input type='radio' name='ticket' id='ticket' value=" + data[counter]["row"] + data[counter]["cell"] + ">"
+                            + " Место " + data[counter]["cell"] + " свободно"
                             + "</td>"
                     } else {
                         tickets += "<td>"
-                            + "<input disabled type='radio' name='ticket' id='ticket' value=" + data[j]["row"] + data[j]["cell"] + ">"
-                            + " Место " + data[j]["cell"] + " занято"
+                            + "<input disabled type='radio' name='ticket' id='ticket' value=" + data[counter]["row"] + data[counter]["cell"] + ">"
+                            + " Место " + data[counter]["cell"] + " занято"
                             + "</td>"
                     }
+                    counter++;
                 }
                 tickets += "</tr>"
             }
@@ -41,7 +46,7 @@
         }).fail(function (err) {
             console.log(err);
         });
-    });
+    }
 
     function getChosenTicket() {
         let ticket = '0'
@@ -66,7 +71,7 @@
 
     function goToPayment() {
         if (validate()) {
-            window.location.href = 'http://localhost:8080/cinema/payment.html?ticket=' + getChosenTicket();
+            window.location.href = 'http://localhost:8080/cinema/payment.jsp?ticket=' + getChosenTicket();
         }
     }
 </script>
